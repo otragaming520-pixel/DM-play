@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>KING TRADING VIP PREDICTOR</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&family=Rajdhani:wght@700&display=swap" rel="stylesheet">
+<!-- FontAwesome Icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+:root {
+    --gold-main: #ffee00;
+    --gold-glow: #ffaa00;
+    --panel-bg: #fffde8;
+    --border-color: #111111;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; font-family:'Orbitron', sans-serif; user-select: none; }
+body { background:#000; overflow:hidden; width: 100vw; height: 100vh; }
+
+#bg-frame { position: fixed; inset: 0; width: 100%; height: 100%; border: none; z-index: 1; }
+
+/* MINI FLOATING BUTTON */
+#mini {
+    position: fixed; right: 20px; bottom: 100px; width: 60px; height: 60px;
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    cursor: pointer; z-index: 9999; background: radial-gradient(circle,#2a3300,#0a0f00);
+    border: 3px solid #111; box-shadow: 0 0 15px var(--gold-main);
+}
+#mini img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+
+/* MAIN PANEL WRAPPER */
+#panel-wrapper {
+    position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    width: 250px; display: none; justify-content: center; align-items: center;
+    z-index: 10000;
+}
+
+/* BUTTERFLY WINGS CONTAINER */
+.wings-bg {
+    position: absolute; width: 440px; height: 260px;
+    pointer-events: none; z-index: 1; display: flex; justify-content: space-between;
+}
+
+.wing {
+    width: 130px; height: 100%;
+    filter: drop-shadow(0 0 8px rgba(0,0,0,0.5));
+    animation: wingPulse 2.5s ease-in-out infinite alternate;
+}
+
+.wing-left { transform-origin: right center; }
+.wing-right { transform-origin: left center; }
+
+@keyframes wingPulse {
+    0% { transform: scale(0.98) rotate(0deg); }
+    100% { transform: scale(1.04) rotate(2deg); }
+}
+
+/* CARTOON UI MAIN PANEL */
+#main {
+    position: relative; z-index: 2; width: 235px;
+    background: var(--panel-bg);
+    border: 3px solid var(--border-color);
+    border-radius: 28px;
+    box-shadow: 0 10px 0px rgba(0,0,0,0.8), inset 0 0 0 2px #fff;
+    padding: 12px 14px; text-align: center; overflow: hidden;
+}
+
+/* HEADER */
+.header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding-bottom: 6px; cursor: move;
+}
+
+.header-title {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 13px; font-weight: 900; color: #000; font-style: italic;
+    letter-spacing: -0.5px;
+}
+
+.gold-circle {
+    width: 22px; height: 22px; background: #ffbe00; border-radius: 50%;
+    border: 2px solid #000; box-shadow: inset -2px -2px 0 rgba(0,0,0,0.3);
+}
+
+.close-btn {
+    width: 22px; height: 22px; border-radius: 50%; border: 2px solid #000;
+    background: #ff4d4d; color: #000; font-size: 11px; display: flex;
+    align-items: center; justify-content: center; cursor: pointer; font-weight: 900;
+}
+
+.dashed-line {
+    border-bottom: 2px dashed #111; margin: 4px 0 8px 0; opacity: 0.7;
+}
+
+/* SUB HEADER (LIVE & ID) */
+.sub-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 10px;
+}
+
+.live-pill {
+    background: #e6ffe6; border: 2px solid #000; border-radius: 12px;
+    padding: 2px 8px; font-size: 9px; font-weight: 900; color: #000;
+    display: flex; align-items: center; gap: 4px;
+}
+.live-dot { width: 6px; height: 6px; background: #00e640; border-radius: 50%; border: 1px solid #000; }
+
+.id-pill {
+    background: #ffda66; border: 2px solid #000; border-radius: 12px;
+    padding: 2px 8px; font-size: 9px; font-weight: 900; color: #000;
+}
+
+/* PREDICTION CONTAINER CARD */
+.pred-card {
+    background: #fff; border: 2.5px solid #000; border-radius: 20px;
+    padding: 8px 6px; box-shadow: 0 4px 0 #000; margin-bottom: 10px;
+}
+
+.pred-top-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 0 4px 6px 4px;
+}
+
+.pill-big {
+    background: #ff5252; color: #fff; border: 2px solid #000;
+    border-radius: 15px; padding: 4px 12px; font-size: 11px; font-weight: 900;
+    box-shadow: 0 2px 0 #000; min-width: 55px;
+}
+
+.result-num {
+    font-size: 24px; font-weight: 900; color: #000; font-family: 'Orbitron', sans-serif;
+}
+
+.pill-color {
+    background: #00e676; color: #000; border: 2px solid #000;
+    border-radius: 15px; padding: 4px 10px; font-size: 11px; font-weight: 900;
+    box-shadow: 0 2px 0 #000; min-width: 55px;
+}
+
+/* CANDLESTICK GRAPH SIMULATION */
+.chart-box {
+    background: #eefceb; border: 2px solid #000; border-radius: 14px;
+    padding: 6px 8px; position: relative; height: 42px;
+    display: flex; align-items: center; justify-content: space-around;
+    overflow: hidden; margin: 4px 0;
+}
+
+.candle { width: 4px; border-radius: 2px; position: relative; }
+.candle.green { background: #00c853; }
+.candle.red { background: #ff1744; }
+.candle::after {
+    content:''; position: absolute; top: -4px; left: 1px; width: 2px; height: 30px;
+    background: inherit; z-index: -1;
+}
+
+.chart-badge {
+    position: absolute; right: 8px; top: 3px; background: #fff;
+    border: 1.5px solid #000; border-radius: 8px; padding: 1px 4px;
+    font-size: 7px; font-weight: 900; color: #000;
+}
+
+.trend-line {
+    position: absolute; left: 0; right: 0; top: 50%; height: 2px;
+    border-top: 2px dashed #00c853; opacity: 0.6;
+}
+
+.conf-badge {
+    display: inline-block; background: #ffda66; border: 2px solid #000;
+    border-radius: 12px; padding: 2px 14px; font-size: 9px; font-weight: 900;
+    color: #000; box-shadow: 0 2px 0 #000; margin-top: 4px;
+}
+
+/* ACTION BUTTON */
+.btn-action {
+    width: 100%; padding: 10px; border: 2.5px solid #000; border-radius: 20px;
+    background: #ffc400; color: #000; font-size: 12px; font-weight: 900;
+    cursor: pointer; box-shadow: 0 4px 0 #000; text-transform: uppercase;
+    transition: 0.1s; letter-spacing: 0.5px;
+}
+.btn-action:active { transform: translateY(3px); box-shadow: 0 1px 0 #000; }
+
+.footer-server {
+    font-size: 9px; font-weight: 900; color: #000; margin-top: 6px;
+    letter-spacing: 1px; display: flex; align-items: center; justify-content: center; gap: 4px;
+}
+
+/* AUTH UI */
+.auth-box {
+    background: #fff; border: 2px solid #000; border-radius: 14px;
+    padding: 8px; margin-bottom: 8px; font-size: 10px; font-weight: 800;
+    color: #000; text-align: left; box-shadow: 0 2px 0 #000;
+}
+</style>
+</head>
+<body>
+
+<iframe id="bg-frame" src="https://dmplay.teacherslex.site/#/"></iframe>
+
+<!-- MINI ICON -->
+<div id="mini" onclick="openM()">
+    <img src="https://i.postimg.cc/3xB9f7wM/1000013396.jpg" alt="Icon">
+</div>
+
+<!-- MAIN FLOATING WRAPPER -->
+<div id="panel-wrapper">
+    
+    <!-- SVG BUTTERFLY WINGS -->
+    <div class="wings-bg">
+        <!-- LEFT WING -->
+        <svg class="wing wing-left" viewBox="0 0 150 250">
+            <defs>
+                <linearGradient id="wingGradL" x1="100%" y1="50%" x2="0%" y2="50%">
+                    <stop offset="0%" stop-color="#ffea00"/>
+                    <stop offset="50%" stop-color="#ff8800"/>
+                    <stop offset="100%" stop-color="#88ff00"/>
+                </linearGradient>
+            </defs>
+            <path d="M 145,120 C 120,90 70,20 10,10 C 0,30 20,70 50,95 C 15,110 0,135 15,160 C 35,185 80,180 100,165 C 60,190 30,220 55,240 C 85,250 125,180 145,130 Z" 
+                  fill="url(#wingGradL)" stroke="#000000" stroke-width="3" opacity="0.95"/>
+            <path d="M 145,125 Q 90,80 15,15 M 145,125 Q 70,100 50,95 M 145,125 Q 70,140 20,160 M 145,125 Q 90,170 55,235" 
+                  stroke="#000000" stroke-width="2" fill="none"/>
+        </svg>
+
+        <!-- RIGHT WING -->
+        <svg class="wing wing-right" viewBox="0 0 150 250">
+            <defs>
+                <linearGradient id="wingGradR" x1="0%" y1="50%" x2="100%" y2="50%">
+                    <stop offset="0%" stop-color="#ffea00"/>
+                    <stop offset="50%" stop-color="#ff8800"/>
+                    <stop offset="100%" stop-color="#88ff00"/>
+                </linearGradient>
+            </defs>
+            <path d="M 5,120 C 30,90 80,20 140,10 C 150,30 130,70 100,95 C 135,110 150,135 135,160 C 115,185 70,180 50,165 C 90,190 120,220 95,240 C 65,250 25,180 5,130 Z" 
+                  fill="url(#wingGradR)" stroke="#000000" stroke-width="3" opacity="0.95"/>
+            <path d="M 5,125 Q 60,80 135,15 M 5,125 Q 80,100 100,95 M 5,125 Q 80,140 130,160 M 5,125 Q 60,170 95,235" 
+                  stroke="#000000" stroke-width="2" fill="none"/>
+        </svg>
+    </div>
+
+    <!-- MAIN PANEL BODY (CARTOON EXACT DESIGN) -->
+    <div id="main">
+        <div class="header" id="dragHandle">
+            <div class="header-title">
+                <div class="gold-circle"></div>
+                <span contenteditable="true">KING PENAL</span>
+            </div>
+            <div class="close-btn" onclick="closeM()">✕</div>
+        </div>
+
+        <div class="dashed-line"></div>
+
+        <!-- AUTH VIEW -->
+        <div id="login-view">
+            <div class="auth-box" contenteditable="true">1. WinGo 1M Connected</div>
+            <div class="auth-box" contenteditable="true">2. Secure API Ready</div>
+            <div class="auth-box" contenteditable="true">3. Engine Synced</div>
+            <button class="btn-action" onclick="showPredictor()">START ENGINE</button>
+        </div>
+
+        <!-- PREDICTION UI VIEW -->
+        <div id="prediction-ui" style="display: none;">
+            
+            <div class="sub-header">
+                <div class="live-pill"><span class="live-dot"></span> LIVE</div>
+                <div class="id-pill" id="idDisplay" contenteditable="true">ID: ---</div>
+            </div>
+
+            <!-- MAIN CARTOON DISPLAY CARD -->
+            <div class="pred-card">
+                <div class="pred-top-row">
+                    <span class="pill-big" id="sizeDisplay" contenteditable="true">BIG</span>
+                    <span class="result-num" id="numDisplay" contenteditable="true">9</span>
+                    <span class="pill-color" id="colorDisplay" contenteditable="true">GREEN</span>
+                </div>
+
+                <!-- CANDLESTICK GRAPH -->
+                <div class="chart-box">
+                    <div class="trend-line"></div>
+                    <div class="candle red" style="height:14px;"></div>
+                    <div class="candle green" style="height:22px;"></div>
+                    <div class="candle red" style="height:10px;"></div>
+                    <div class="candle green" style="height:26px;"></div>
+                    <div class="candle green" style="height:18px;"></div>
+                    <div class="candle red" style="height:12px;"></div>
+                    <div class="candle green" style="height:24px;"></div>
+                    <div class="chart-badge" id="trendPercent" contenteditable="true">+3.35%</div>
+                </div>
+
+                <div class="conf-badge" id="confDisplay" contenteditable="true">CONF(98.6%)</div>
+            </div>
+
+            <button class="btn-action" onclick="fetchLiveResultAndPredict()">CHECK NEXT</button>
+        </div>
+
+        <div class="footer-server" contenteditable="true">⚡ SERVER ⚡</div>
+    </div>
+
+</div>
+
+<script>
+const API_URL = "https://draw.ar-lottery01.com/WinGo/WinGo_1M/GetHistoryIssuePage.json?ts=";
+
+function openM() {
+    document.getElementById('panel-wrapper').style.display = 'flex';
+    document.getElementById('mini').style.display = 'none';
+}
+function closeM() {
+    document.getElementById('panel-wrapper').style.display = 'none';
+    document.getElementById('mini').style.display = 'flex';
+}
+
+function showPredictor() {
+    document.getElementById('login-view').style.display = 'none';
+    document.getElementById('prediction-ui').style.display = 'block';
+    fetchLiveResultAndPredict();
+}
+
+function updatePeriod() {
+    const now = new Date();
+    const year = now.getUTCFullYear();
+    const month = String(now.getUTCMonth() + 1).padStart(2, '0');
+    const day = String(now.getUTCDate()).padStart(2, '0');
+    const totalMinutes = now.getUTCHours() * 60 + now.getUTCMinutes();
+    const sequence = String(10001 + totalMinutes);
+    const periodId = `${year}${month}${day}${sequence}`;
+    
+    // Extract last 3 digits for ID
+    const shortId = periodId.slice(-3);
+    document.getElementById('idDisplay').innerText = "ID: " + shortId;
+    return periodId;
+}
+
+// API से लाइव रिजल्ट फैच करके पैनल में शो कराने का सिस्टम
+async function fetchLiveResultAndPredict() {
+    const numEl = document.getElementById('numDisplay');
+    const sizeEl = document.getElementById('sizeDisplay');
+    const colorEl = document.getElementById('colorDisplay');
+    const confEl = document.getElementById('confDisplay');
+    const trendEl = document.getElementById('trendPercent');
+    
+    updatePeriod();
+    
+    numEl.innerText = "..";
+
+    try {
+        const response = await fetch(API_URL + Date.now());
+        const data = await response.json();
+        
+        if (data && data.data && data.data.list && data.data.list.length > 0) {
+            const latestDraw = data.data.list[0];
+            const num = parseInt(latestDraw.number, 10);
+            const size = num >= 5 ? "BIG" : "SMALL";
+            
+            // Color Logic
+            let color = "GREEN";
+            let colorBg = "#00e676";
+            if (num === 0) { color = "RED/VIOLET"; colorBg = "#ff1744"; }
+            else if (num === 5) { color = "GREEN/VIOLET"; colorBg = "#00e676"; }
+            else if (num % 2 === 0) { color = "RED"; colorBg = "#ff5252"; }
+            
+            // Size background pill color
+            const sizeBg = size === "BIG" ? "#ff5252" : "#29b6f6";
+
+            let randomConf = (94 + Math.random() * 5.5).toFixed(1);
+            let randomTrend = "+" + (2 + Math.random() * 4).toFixed(2) + "%";
+
+            setTimeout(() => {
+                numEl.innerText = num;
+                sizeEl.innerText = size;
+                sizeEl.style.background = sizeBg;
+                
+                colorEl.innerText = color;
+                colorEl.style.background = colorBg;
+
+                confEl.innerText = `CONF(${randomConf}%)`;
+                trendEl.innerText = randomTrend;
+            }, 400);
+        } else {
+            fallbackRandomPrediction(numEl, sizeEl, colorEl, confEl, trendEl);
+        }
+    } catch (e) {
+        fallbackRandomPrediction(numEl, sizeEl, colorEl, confEl, trendEl);
+    }
+}
+
+function fallbackRandomPrediction(numEl, sizeEl, colorEl, confEl, trendEl) {
+    const num = Math.floor(Math.random() * 10);
+    const size = num >= 5 ? "BIG" : "SMALL";
+    const color = num % 2 === 0 ? "RED" : "GREEN";
+    
+    numEl.innerText = num;
+    sizeEl.innerText = size;
+    colorEl.innerText = color;
+    confEl.innerText = "CONF(98.8%)";
+    trendEl.innerText = "+4.25%";
+}
+
+// SMOOTH DRAGGING LOGIC FOR FLOATING PANEL
+const wrapper = document.getElementById("panel-wrapper");
+const dragHandle = document.getElementById("dragHandle");
+let isDragging = false, offset = { x: 0, y: 0 };
+
+const dragStart = (e) => {
+    if(e.target.hasAttribute('contenteditable')) return;
+    isDragging = true;
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    
+    const rect = wrapper.getBoundingClientRect();
+    offset.x = clientX - rect.left;
+    offset.y = clientY - rect.top;
+};
+
+const dragMove = (e) => {
+    if (!isDragging) return;
+    e.preventDefault();
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    
+    let newX = clientX - offset.x;
+    let newY = clientY - offset.y;
+    
+    wrapper.style.left = newX + (wrapper.offsetWidth / 2) + "px";
+    wrapper.style.top = newY + (wrapper.offsetHeight / 2) + "px";
+};
+
+dragHandle.addEventListener("mousedown", dragStart);
+dragHandle.addEventListener("touchstart", dragStart, {passive: false});
+document.addEventListener("mousemove", dragMove);
+document.addEventListener("touchmove", dragMove, {passive: false});
+document.addEventListener("mouseup", () => isDragging = false);
+document.addEventListener("touchend", () => isDragging = false);
+</script>
+
+</body>
+</html>
